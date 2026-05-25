@@ -1,0 +1,67 @@
+import json
+import requests
+from dotenv import load_dotenv
+
+# -----------------------------
+# Load environment variables
+# -----------------------------
+load_dotenv()
+
+# -----------------------------
+# Build connector JSON in memory
+# -----------------------------
+connector_config = {
+    "name": "transactions-postgres-connector",
+    "config": {
+        "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+
+        "database.hostname": "postgres",
+        "database.port": "5432",
+        "database.user": "postgres",
+        "database.password": "postgres",
+        "database.dbname": "transactions_de",
+
+        "topic.prefix": "transactions_server",
+        "plugin.name": "pgoutput",
+
+        "publication.autocreate.mode": "filtered",
+        "publication.name": "transaction_publication",
+        "slot.name": "transaction_debezium_slot",
+
+        "table.include.list": (
+            "public.customers,"
+            "public.cards,"
+            "public.transactions,"
+        ),
+
+        "snapshot.mode": "initial",
+
+        "decimal.handling.mode": "string",
+        "time.precision.mode": "adaptive",
+
+        "tombstones.on.delete": "false",
+        "heartbeat.interval.ms": "10000",
+
+        "provide.transaction.metadata": "true"
+    },
+}
+
+# -----------------------------
+# Send request to Debezium Connect
+# -----------------------------
+url = "http://localhost:8083/connectors"
+headers = {"Content-Type": "application/json"}
+
+response = requests.post(url, headers=headers, data=json.dumps(connector_config))
+
+# -----------------------------
+# Debug/Output
+# -----------------------------
+if response.status_code == 201:
+    print("✅ Connector created successfully!")
+elif response.status_code == 409:
+    print("⚠️ Connector already exists.")
+else:
+    print(f"❌ Failed to create connector ({response.status_code}): {response.text}")
+
+
