@@ -16,6 +16,8 @@ transactions_dbt/seeds/
 transactions_dbt/target/
 transactions_dbt/tests/
 
+data/
+
 .env
 __pycache__/
 *.pyc

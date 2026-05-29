@@ -1,0 +1,16 @@
+Run the below in bash to check if the file is in zip
+
+python - <<'PY'
+from pathlib import Path
+import zipfile
+
+p = Path("data/raw/kaggle_card_transactions/credit_card_transactions-ibm_v2.csv")
+
+print("Exists:", p.exists())
+print("Size:", p.stat().st_size)
+
+print("Is ZIP:", zipfile.is_zipfile(p))
+
+with open(p, "rb") as f:
+    print("First 10 bytes:", f.read(10))
+PY
